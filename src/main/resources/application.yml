@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: weather-service
+  profiles:
+    active: dev
+
+logging:
+  level:
+    root: INFO
+    org.springframework: DEBUG
+    com.example: DEBUG
+
+server:
+  port: 8081
+  servlet:
+      context-path: /weather
