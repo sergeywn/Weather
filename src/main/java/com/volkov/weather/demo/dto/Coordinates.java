@@ -1,6 +1,11 @@
 package com.volkov.weather.demo.dto;
 
-public record Coordinates(String latitude,
-                          String longitude) {
+import lombok.Data;
+
+@Data
+public class Coordinates {
+
+    String latitude;
+    String longitude;
 
 }

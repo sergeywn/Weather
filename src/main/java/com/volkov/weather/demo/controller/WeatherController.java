@@ -1,14 +1,12 @@
 package com.volkov.weather.demo.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.volkov.weather.demo.dto.Coordinates;
-import com.volkov.weather.demo.dto.OpenWeatherMapDayDto;
-import com.volkov.weather.demo.dto.OpenWeatherMapFourDaysDto;
-import com.volkov.weather.demo.dto.WeatherEolDto;
+import com.volkov.weather.demo.dto.WeatherDto;
+import com.volkov.weather.demo.service.AllWeatherService;
 import com.volkov.weather.demo.service.WeatherService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,49 +20,34 @@ import java.util.List;
 @RequestMapping("/api/v1")
 public class WeatherController {
 
-    private final WeatherService weatherService;
+    private final WeatherService eolService;
+    private final WeatherService openWeatherMapService;
+    private final AllWeatherService allWeatherService;
 
-    @PostMapping(value = "/eol-day", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<WeatherEolDto>> getWeatherForDayFromEol(@RequestBody Coordinates coordinates) {
-        try {
-            List<WeatherEolDto> result = weatherService.weatherEolDay(coordinates.latitude(), coordinates.longitude());
-            return ResponseEntity.ok(result); // успешный результат
-        } catch (Exception e) { // Обрабатываем возможные исключения
-            log.error("Ошибка при получении погоды: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // ошибка сервера
-        }
+    @PostMapping(value = "/{provider}/{forecastType}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public List<WeatherDto> getWeather(
+            @PathVariable String provider,
+            @PathVariable String forecastType,
+            @RequestBody Coordinates coordinates) throws Exception {
+
+        String latitude = coordinates.getLatitude();
+        String longitude = coordinates.getLongitude();
+
+        return switch (provider) {
+            case "eol" -> getWeatherFromService(eolService, forecastType, latitude, longitude);
+            case "openweathermap" -> getWeatherFromService(openWeatherMapService, forecastType, latitude, longitude);
+            case "all" -> allWeatherService.getWeather(latitude, longitude, forecastType);
+            default -> throw new IllegalArgumentException("Неизвестный провайдер: " + provider);
+        };
     }
 
-    @PostMapping(value = "/eol-week", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<WeatherEolDto>> getWeatherForWeekFromEol(@RequestBody Coordinates coordinates) {
-        try {
-            List<WeatherEolDto> result = weatherService.weatherEolWeek(coordinates.latitude(), coordinates.longitude());
-            return ResponseEntity.ok(result); // успешный результат
-        } catch (Exception e) { // Обрабатываем возможные исключения
-            log.error("Ошибка при получении погоды: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // ошибка сервера
-        }
-    }
-
-    @PostMapping(value = "/open-weather-map-day", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<OpenWeatherMapDayDto> getWeatherForDayFromOpenWeatherMap(@RequestBody Coordinates coordinates) {
-        try {
-            OpenWeatherMapDayDto result = weatherService.openWeatherMapDay(coordinates.latitude(), coordinates.longitude());
-            return ResponseEntity.ok(result); // успешный результат
-        } catch (Exception e) { // Обрабатываем возможные исключения
-            log.error("Ошибка при получении погоды: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // ошибка сервера
-        }
-    }
-
-    @PostMapping(value = "/open-weather-map-four-days", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<OpenWeatherMapFourDaysDto>> getWeatherForFourDaysFromOpenWeatherMap(@RequestBody Coordinates coordinates) {
-        try {
-            List<OpenWeatherMapFourDaysDto> result = weatherService.openWeatherMapFourDaysDto(coordinates.latitude(), coordinates.longitude());
-            return ResponseEntity.ok(result); // успешный результат
-        } catch (Exception e) { // Обрабатываем возможные исключения
-            log.error("Ошибка при получении погоды: {}", e.getMessage(), e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build(); // ошибка сервера
+    private List<WeatherDto> getWeatherFromService(WeatherService service, String forecastType, String latitude, String longitude) throws Exception {
+        if ("day".equals(forecastType)) {
+            return service.getWeatherForDay(latitude, longitude);
+        } else if ("fourDays".equals(forecastType)) {
+            return service.getWeatherForFourDays(latitude, longitude);
+        } else {
+            throw new IllegalArgumentException("Неизвестный тип прогноза: " + forecastType);
         }
     }
 

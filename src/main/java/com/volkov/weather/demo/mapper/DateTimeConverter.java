@@ -1,7 +1,5 @@
 package com.volkov.weather.demo.mapper;
 
-import com.volkov.weather.demo.dto.WeatherEolDto;
-import com.volkov.weather.demo.model.WeatherEolModel;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
