@@ -6,6 +6,9 @@ import org.springframework.stereotype.Component;
 public class PressureMapper {
 
     public String evaluatePressure(double pressureInMmHg) {
+        if (pressureInMmHg < 700 || pressureInMmHg > 800) {
+            return "Недопустимое значение давления";
+        }
         if (pressureInMmHg < 750) {
             return "Очень низкое давление";
         } else if (pressureInMmHg >= 750 && pressureInMmHg <= 755) {
@@ -18,9 +21,8 @@ public class PressureMapper {
             return "Высокое давление";
         } else if (pressureInMmHg > 772) {
             return "Очень высокое давление";
-        } else {
-            return "Недопустимое значение давления";
         }
+        // Добавьте возврат по умолчанию, чтобы покрыть все возможные случаи
+        return "Недопустимое значение давления";
     }
-
 }

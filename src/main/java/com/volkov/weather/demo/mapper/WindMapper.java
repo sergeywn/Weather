@@ -6,6 +6,10 @@ import org.springframework.stereotype.Component;
 public class WindMapper {
 
     public String getWindDirectionText(double degrees) {
+        if (degrees < 0 || degrees > 360) {
+            return "Неопределено";
+        }
+
         if (degrees >= 337.5 || degrees < 22.5) {
             return "Север";
         } else if (degrees >= 22.5 && degrees < 67.5) {
@@ -22,9 +26,9 @@ public class WindMapper {
             return "Запад";
         } else if (degrees >= 292.5 && degrees < 337.5) {
             return "Северо-запад";
-        } else {
-            return "Неопределено"; // Для покрытия крайних случаев
         }
+        return "Неопределено";
     }
+
 
 }
