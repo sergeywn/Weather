@@ -1,13 +1,16 @@
 package com.volkov.weather.demo.mapper;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = { WindMapper.class })
+@Tag("Mapper")
 class WindMapperTest {
 
     @Autowired
@@ -15,20 +18,21 @@ class WindMapperTest {
 
     @Test
     public void testGetWindDirectionText() {
-        assertNotNull(windMapper); // Убедимся, что бин был успешно загружен
+        // Убедимся, что бин был успешно загружен
+        assertThat(windMapper).isNotNull();
 
         // Проверим различные направления ветра
-        assertEquals("Север", windMapper.getWindDirectionText(0));
-        assertEquals("Север", windMapper.getWindDirectionText(10));
-        assertEquals("Северо-восток", windMapper.getWindDirectionText(45));
-        assertEquals("Восток", windMapper.getWindDirectionText(90));
-        assertEquals("Юго-восток", windMapper.getWindDirectionText(135));
-        assertEquals("Юг", windMapper.getWindDirectionText(180));
-        assertEquals("Юго-запад", windMapper.getWindDirectionText(225));
-        assertEquals("Запад", windMapper.getWindDirectionText(270));
-        assertEquals("Северо-запад", windMapper.getWindDirectionText(315));
-        assertEquals("Север", windMapper.getWindDirectionText(360)); // Оборачивание вокруг круга
-        assertEquals("Неопределено", windMapper.getWindDirectionText(-1)); // Неверное значение
+        assertThat(windMapper.getWindDirectionText(0)).isEqualTo("Север");
+        assertThat(windMapper.getWindDirectionText(10)).isEqualTo("Север");
+        assertThat(windMapper.getWindDirectionText(45)).isEqualTo("Северо-восток");
+        assertThat(windMapper.getWindDirectionText(90)).isEqualTo("Восток");
+        assertThat(windMapper.getWindDirectionText(135)).isEqualTo("Юго-восток");
+        assertThat(windMapper.getWindDirectionText(180)).isEqualTo("Юг");
+        assertThat(windMapper.getWindDirectionText(225)).isEqualTo("Юго-запад");
+        assertThat(windMapper.getWindDirectionText(270)).isEqualTo("Запад");
+        assertThat(windMapper.getWindDirectionText(315)).isEqualTo("Северо-запад");
+        assertThat(windMapper.getWindDirectionText(360)).isEqualTo("Север"); // Оборачивание вокруг круга
+        assertThat(windMapper.getWindDirectionText(-1)).isEqualTo("Неопределено"); // Неверное значение
     }
 
 }
